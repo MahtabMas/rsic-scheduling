@@ -31,33 +31,33 @@ All experiments use real Microsoft Azure VM workload data (Machine 0, Priority 0
 | Algorithm | Competitive Ratio |
 |---|---|
 | NextFit | 4.48 |
-| ModifiedNextFit | 4.48 |
+| ModifiedNextFit (MNF) | 4.48 |
 | WorstFit | 2.81 |
 | RandomFit | 2.55 |
-| MoveToFront | 2.48 |
+| MoveToFront (MTF) | 2.48 |
 | LastFit | 2.24 |
 | BestFit | 2.21 |
 | FirstFit | 2.00 |
-| ModifiedFirstFit | 2.00 |
+| ModifiedFirstFit (MFF) | 2.00 |
 
 ### Clairvoyant Algorithms
 | Algorithm | Competitive Ratio |
 |---|---|
-| DepartureStrategy | 6.17 |
-| Duration | 1.83 |
+| Departure Strategy | 6.17 |
+| Duration Strategy | 1.83 |
 | Greedy | 1.64 |
-| NewHybrid | 1.30 |
-| HybridAlgorithm | 1.29 |
+| New Hybrid (HA⊕d) | 1.30 |
+| Hybrid Algorithm (HA) | 1.29 |
 
 ### New Combined Algorithms (this work)
 | Algorithm | Competitive Ratio |
 |---|---|
-| Greedy-Greedy | 1.28 |
-| Greedy-Duration | 1.28 |
-| NewGreedy | 1.41 |
-| **Greedy-Hybrid** | **1.18** ← best overall |
+| New Greedy | 1.41 |
 | FirstFit-FirstFit | 1.41 |
 | FirstFit-BestFit | 1.42 |
+| Greedy-Greedy | 1.28 |
+| Greedy-Duration | 1.28 |
+| **Greedy-Hybrid** | **1.18** ← best overall |
 
 ## Dataset
 
@@ -154,42 +154,41 @@ int64_t threshold_step = 100000000;  // 10^8
 ### Non-Clairvoyant
 Job duration is unknown at arrival time.
 
-| Class | Description |
+| Algorithm | Description |
 |---|---|
-| `NextFit_dimensional` | One open server at a time |
-| `ModifiedNextFit_dimensional` | Separate NextFit for large and small jobs |
-| `FirstFit_dimensional` | First server with enough capacity |
-| `ModifiedFirstFit_dimensional` | Separate FirstFit for large and small jobs |
-| `BestFit_dimensional` | Tightest-fitting server |
-| `WorstFit_dimensional` | Loosest-fitting server |
-| `LastFit_dimensional` | Most recently opened server first |
-| `RandomFit_dimensional` | Random eligible server |
-| `MTF_dimensional` | MoveToFront: most recently used server first |
+| NextFit | One open server at a time |
+| ModifiedNextFit (MNF) | Separate NextFit for large and small jobs |
+| FirstFit | First server with enough capacity |
+| ModifiedFirstFit (MFF) | Separate FirstFit for large and small jobs |
+| BestFit | Tightest-fitting server |
+| WorstFit | Loosest-fitting server |
+| LastFit | Most recently opened server first |
+| RandomFit | Random eligible server |
+| MoveToFront (MTF) | Most recently used server first |
 
 ### Clairvoyant
 Job duration is known at arrival time.
 
-| Class | Description |
+| Algorithm | Description |
 |---|---|
-| `DepartureStrategy` | Groups jobs by departure time intervals |
-| `Duration` | Groups jobs by exponential duration buckets |
-| `HybridAlgorithm` | HA: classifies by duration and arrival time, O(√log µ) competitive |
-| `NewHybrid` | HA⊕d: d independent HA copies, one per dimension |
-| `Greedy_dimensional` | Minimises server duration extension |
+| Departure Strategy | Groups jobs by departure time intervals |
+| Duration Strategy | Groups jobs by exponential duration buckets |
+| Hybrid Algorithm (HA) | Classifies by duration and arrival time, O(√log µ) competitive |
+| New Hybrid (HA⊕d) | d independent HA copies, one per dimension |
+| Greedy | Minimises server duration extension |
 
 ### Combined (this work)
 Splits jobs into short and long using a duration threshold τ.
 
-| Class | Type | Description |
+| Algorithm | Type | Description |
 |---|---|---|
-| `Greedy_Greedy` | Clairvoyant | Greedy for both short and long jobs |
-| `Greedy_dimensional_with_Hybrid` | Clairvoyant | Greedy for short, HA for long: best overall |
-| `Greedy_Duration` | Clairvoyant | Greedy for short, Duration for long |
-| `NewGreedy` | Clairvoyant | Greedy variant with extension threshold |
-| `FirstFit_FirstFit` | Weakly Clairvoyant | FirstFit for both; recommended safe choice |
-| `FirstFit_BestFit` | Weakly Clairvoyant | FirstFit for short, BestFit for long |
-| `BestFit_BestFit` | Weakly Clairvoyant | BestFit for both |
-| `BestFit_FirstFit` | Weakly Clairvoyant | BestFit for short, FirstFit for long |
-
+| Greedy-Greedy | Clairvoyant | Greedy for both short and long jobs |
+| Greedy-Hybrid | Clairvoyant | Greedy for short, HA for long: best overall |
+| Greedy-Duration | Clairvoyant | Greedy for short, Duration Strategy for long |
+| New Greedy | Clairvoyant | Greedy variant with extension threshold |
+| FirstFit-FirstFit | Weakly Clairvoyant | FirstFit for both, recommended safe choice |
+| FirstFit-BestFit | Weakly Clairvoyant | FirstFit for short, BestFit for long |
+| BestFit-BestFit | Weakly Clairvoyant | BestFit for both |
+| BestFit-FirstFit | Weakly Clairvoyant | BestFit for short, FirstFit for long |
 ## License
 MIT License
