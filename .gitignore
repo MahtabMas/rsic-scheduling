@@ -1,0 +1,12 @@
+#Build files
+build/
+
+#Mac system files
+.DS_Store
+
+#VS Code settings
+.vscode/
+
+#Output and data files
+*.csv
+
