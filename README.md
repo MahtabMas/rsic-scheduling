@@ -97,6 +97,8 @@ rsic-scheduling/
 │   ├── data_loader.cpp
 │   ├── plotter.cpp
 │   └── experiment.cpp
+├── analysis/
+│   └── mip_optimal.py           # Offline MIP optimal solver (OR-Tools/SCIP)
 ├── main.cpp
 ├── CMakeLists.txt
 └── README.md
@@ -190,5 +192,56 @@ Splits jobs into short and long using a duration threshold τ.
 | FirstFit-BestFit | Weakly Clairvoyant | FirstFit for short, BestFit for long |
 | BestFit-BestFit | Weakly Clairvoyant | BestFit for both |
 | BestFit-FirstFit | Weakly Clairvoyant | BestFit for short, FirstFit for long |
-## License
-MIT License
+
+## Offline Optimal (MIP)
+
+The main experiments report competitive ratios against the lower bound from Lemma 1 (Murhekar et al.), since computing the exact offline optimal is intractable on the full dataset of 112,552 jobs. To validate this choice, we formulate the true offline optimal as a MILP and solve it on representative µ-filtered batches using OR-Tools/SCIP.
+
+**Formulation.** Given $n$ jobs with start time $a_j$, end time $f_j$, resource request $\mathbf{r}_j \in \mathbb{Z}^4$, and $m$ identical servers with capacity $E = 1000$ per dimension:
+
+$$\min \sum_i rent_i$$
+
+subject to:
+
+$$\sum_i x_{ij} = 1 \quad \forall j \tag{1}$$
+
+$$\sum_{j:\, a_j \leq t < f_j} r_j^k \cdot x_{ij} \leq E \quad \forall i, k, t \tag{2}$$
+
+$$e_i \geq f_j \cdot x_{ij} \quad \forall i, j \tag{3}$$
+
+$$o_i \leq a_j + M(1 - x_{ij}) \quad \forall i, j \tag{4}$$
+
+$$e_i - o_i \leq M \cdot y_i \quad \forall i \tag{5}$$
+
+$$y_i \geq x_{ij} \quad \forall i, j \tag{6}$$
+
+$$rent_i \geq e_i - o_i \quad \forall i \tag{7}$$
+
+$$x_{ij},\, y_i \in \{0,1\}, \quad e_i,\, o_i,\, rent_i \geq 0$$
+
+Constraint (2) is time-aware: at each event time $t$, only jobs active on server $i$ at that moment contribute to the capacity check. Constraints (3)–(4) model server open and close times via big-M. Constraint (7) ensures non-negative rental duration.
+
+**Setup.**
+
+```bash
+cd analysis
+python3 -m venv mip_env
+source mip_env/bin/activate
+pip install ortools pandas numpy
+# update base_path in mip_optimal.py to point to your mu-filtered CSV files
+python3 mip_optimal.py
+```
+
+To generate the µ-filtered CSV files, set `apply_mu_filter = true` and the desired `custom_mu` in `main.cpp`, rebuild, and run the C++ scheduler. Repeat for each µ value.
+
+**Results** (batch size = 20 jobs, Machine 0, Priority 0):
+
+| µ | Greedy/LB | MIP/LB | Greedy/MIP | Status |
+|---|---|---|---|---|
+| 2 | 1.1432 | 1.0001 | 1.1431 | OPTIMAL |
+| 5 | 1.3556 | 1.0660 | 1.2717 | OPTIMAL |
+| 10 | 1.5897 | 1.0526 | 1.5103 | OPTIMAL |
+| 100 | 1.0337 | 1.0032 | 1.0304 | OPTIMAL |
+
+MIP/LB ratios between 1.0001 and 1.0660 confirm the lower bound is tight across all µ values, validating its use as a proxy for OPT in the main experiments.
+

@@ -137,3 +137,22 @@ void saveDataForPlotting_raw(const std::vector<RawJob_dimensional>& jobs, const 
     for (auto s : ssdSizes)    outFilessd       << s << "\n";
     for (auto n : nicSizes)    outFilenic       << n << "\n";
 }
+
+void saveJobsForMIP(const std::vector<Job_dimensional>& jobs, const std::string& filepath) {
+    std::ofstream out(filepath);
+    if (!out.is_open()) {
+        std::cerr << "Could not open file for MIP export: " << filepath << std::endl;
+        return;
+    }
+    out << "start,end,duration,core,memory,ssd,nic\n";
+    for (const auto& job : jobs) {
+        out << job.start << ","
+            << job.end   << ","
+            << (job.end - job.start) << ","
+            << job.size[0] << ","
+            << job.size[1] << ","
+            << job.size[2] << ","
+            << job.size[3] << "\n";
+    }
+    std::cout << "Saved " << jobs.size() << " jobs to " << filepath << std::endl;
+}

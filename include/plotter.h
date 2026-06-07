@@ -8,3 +8,6 @@ void saveDataForPlotting_raw(const std::vector<RawJob_dimensional>& jobs, const 
 
 // saves integer job data to CSV files for plotting (after integer conversion)
 void saveDataForPlotting_int(const std::vector<Job_dimensional>& jobs, const std::string& output_dir);
+
+// saves mu-filtered integer jobs to CSV for Python MIP analysis
+void saveJobsForMIP(const std::vector<Job_dimensional>& jobs, const std::string& filepath);

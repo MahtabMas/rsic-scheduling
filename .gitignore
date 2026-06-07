@@ -1,12 +1,18 @@
-#Build files
+# Build files
 build/
 
-#Mac system files
+# Mac system files
 .DS_Store
 
-#VS Code settings
+# VS Code settings
 .vscode/
 
-#Output and data files
+# Output and data files
 *.csv
 
+# Python virtual environment
+analysis/mip_env/
+
+# Python cache
+__pycache__/
+*.pyc

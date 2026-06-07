@@ -11,8 +11,8 @@ int main() {
     bool priority_zero_only = true;   // false = keep both priorities
     bool apply_mu_filter    = false;  // true = filter by custom mu
     int64_t custom_mu       = 100;    // only used if apply_mu_filter = true
-    bool save_plots_raw     = true;   // save raw double plotting CSVs
-    bool save_plots_int     = true;   // save integer plotting CSVs
+    bool save_plots_raw     = false;   // save raw double plotting CSVs
+    bool save_plots_int     = false;   // save integer plotting CSVs
 
     // ---- Algorithm Parameters (optimal values from grid search) ----
     int64_t threshold_clairvoyant        = 400000000;   // optimal τ for Greedy-Hybrid, Greedy-Departure
@@ -50,11 +50,15 @@ int main() {
     if (apply_mu_filter)
         jobs = filterByMu(jobs, custom_mu);
 
+    // ---- Step 6b: Export mu-filtered jobs for Python MIP ----
+    if (apply_mu_filter)
+        saveJobsForMIP(jobs, output_dir + "mip_jobs_mu" + std::to_string(custom_mu) + ".csv");
+
     // ---- Step 7: Compute mu ----
     int64_t mu = computeMu(jobs);
     std::cout << "mu = " << mu << std::endl;
 
-    // ---- Step 8: Run experiments ----
+    //---- Step 8: Run experiments ----
     run_Azure_experiment_dimensional(mu, jobs, output_dir,
         threshold_clairvoyant,
         threshold_greedy_greedy,
@@ -64,7 +68,7 @@ int main() {
         interval_departure,
         interval_duration);
 
-    // ---- Step 9: Grid Search (optional) ----
+    //---- Step 9: Grid Search (optional) ----
     if (run_grid_search_flag)
         run_grid_search(mu, jobs, output_dir, threshold_min, threshold_max, threshold_step);
 
